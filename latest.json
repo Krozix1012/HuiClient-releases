@@ -1,10 +1,25 @@
 {
-  "version": "1.0.0",
-  "date": "2026-11-10",
-  "size": 240720700,
-  "sha256": "fed017dddb53dba8fabff4a0f7086f277849323574b71c4d5e49fd8cc5f941a7",
-  "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.0/HuiClient-Setup-1.0.0.exe",
+  "version": "1.0.1",
+  "date": "2026-11-11",
+  "size": 240740929,
+  "sha256": "34de7e562d3f11cd3dd3a2073a9227f60d4e5fe581806cc725f5e15adbc2dbbf",
+  "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.1/HuiClient-Setup-1.0.1.exe",
   "changelog": [
+    {
+      "version": "1.0.1",
+      "date": "2026-11-11",
+      "title": "A new way to sign in",
+      "sections": [
+        [
+          "New",
+          [
+            "Signing in now happens inside HuiClient, on a full-window screen instead of a separate Roblox window.",
+            "Quick Log In: sign in with a code you confirm on your phone, no password needed.",
+            "A short welcome after you sign in."
+          ]
+        ]
+      ]
+    },
     {
       "version": "1.0.0",
       "date": "2026-11-10",
