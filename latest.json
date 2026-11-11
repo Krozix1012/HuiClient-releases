@@ -1,8 +1,8 @@
 {
   "version": "1.0.1",
   "date": "2026-11-11",
-  "size": 240740929,
-  "sha256": "34de7e562d3f11cd3dd3a2073a9227f60d4e5fe581806cc725f5e15adbc2dbbf",
+  "size": 241549327,
+  "sha256": "2fe47d247f12132bed0ad2972f99396fdd427c2e19d9cf1759047e6150d61e3d",
   "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.1/HuiClient-Setup-1.0.1.exe",
   "changelog": [
     {
@@ -15,7 +15,9 @@
           [
             "Signing in now happens inside HuiClient, on a full-window screen instead of a separate Roblox window.",
             "Quick Log In: sign in with a code you confirm on your phone, no password needed.",
-            "A short welcome after you sign in."
+            "A short welcome after you sign in.",
+            "Find players remembers the players you open, under Recent searches.",
+            "Saved avatars on every profile: see the avatars a player saved, each in 3D with its items and prices."
           ]
         ]
       ]
