@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HuiClient</title>
+<meta name="description" content="A Roblox launcher for Windows. Play, find your friends and switch accounts from one dark, quiet window.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="icon.png">
+<style>
+@font-face { font-family: Inter; src: url(inter.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
+:root { --bg: #000; --fg: #fff; --muted: #8f8f8f; --line: #ffffff1a; --glass: #0b0b0bb8; --ease: cubic-bezier(.2,.8,.2,1); }
+* { box-sizing: border-box; margin: 0; }
+html { background: var(--bg); }
+body { background: var(--bg); color: var(--fg); font: 16px/1.55 Inter, "Segoe UI", system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: 6px; }
+
+/* the same backdrop as HuiClient's sign-in screen: blurred grey art, fog, grain and rising embers */
+.backdrop { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.backdrop-art { position: absolute; inset: -10%; background: url(home.jpg) center / cover; filter: grayscale(1) blur(16px) brightness(.42) contrast(1.25); transform: rotate(-6deg) scale(1.15); animation: drift 90s ease-in-out infinite alternate; }
+@keyframes drift { to { transform: rotate(-4deg) scale(1.25) translate(-3%, 2%); } }
+.backdrop-fog { position: absolute; inset: -30%; background: radial-gradient(40% 30% at 30% 60%, #ffffff12, transparent 70%), radial-gradient(35% 25% at 75% 35%, #ffffff0e, transparent 70%); animation: fog 40s ease-in-out infinite alternate; }
+@keyframes fog { to { transform: translate(8%, -6%) scale(1.15); } }
+.backdrop-shade { position: absolute; inset: 0; background: radial-gradient(ellipse 85% 75% at 50% 30%, #0000 0%, #0006 60%, #000d 100%); }
+.backdrop-grain { position: absolute; inset: 0; opacity: .12; mix-blend-mode: overlay; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+#embers { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.wrap { width: min(1080px, 100% - 32px); margin: 0 auto; }
+header { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.3px; text-decoration: none; }
+.brand svg { width: 24px; height: 24px; fill: #fff; }
+.quiet { color: var(--muted); font-size: 14px; font-weight: 600; text-decoration: none; }
+.quiet:hover { color: var(--fg); }
+
+/* the logo fills with white from the bottom up, like the installer's progress */
+.hero { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 72px 0 56px; }
+.mark { position: relative; width: 104px; height: 104px; filter: drop-shadow(0 0 28px #ffffff40); }
+.mark svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.mark .empty path { fill: none; stroke: #ffffff3d; stroke-width: 2.4; stroke-linejoin: round; }
+.mark .full path { fill: #fff; }
+.mark .full { clip-path: inset(100% 0 0 0); animation: fill 1.4s cubic-bezier(.65,0,.35,1) .25s forwards; }
+@keyframes fill { to { clip-path: inset(0 0 0 0); } }
+h1 { margin-top: 28px; font-size: clamp(52px, 10vw, 104px); font-weight: 800; letter-spacing: -.055em; line-height: .95; text-shadow: 0 0 60px #ffffff26; }
+.lede { max-width: 34ch; margin-top: 18px; color: #c9c9c9; font-size: clamp(17px, 2.2vw, 20px); }
+.get { display: inline-flex; align-items: center; gap: 12px; margin-top: 34px; padding: 16px 30px; border-radius: 16px; background: #fff; color: #000; font-weight: 700; font-size: 17px; text-decoration: none; box-shadow: 0 0 0 1px #fff, 0 18px 60px #ffffff24; transition: transform .2s var(--ease), box-shadow .2s; }
+.get:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px #fff, 0 22px 70px #ffffff38; }
+.get:active { transform: none; }
+.get svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.meta { margin-top: 14px; color: var(--muted); font-size: 14px; }
+
+.shot { margin: 8px auto 0; padding: 10px; border-radius: 26px; background: var(--glass); border: 1px solid var(--line); box-shadow: 0 40px 120px #000; backdrop-filter: blur(14px); }
+.shot img { display: block; width: 100%; height: auto; border-radius: 17px; }
+
+section { padding: 96px 0 0; }
+h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; letter-spacing: -.035em; line-height: 1.1; }
+.intro { margin-top: 10px; color: var(--muted); max-width: 56ch; }
+.does { display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 56px; margin-top: 30px; list-style: none; padding: 0; }
+.does li { padding: 18px 0; border-top: 1px solid var(--line); }
+.does b { display: block; margin-bottom: 2px; font-weight: 700; }
+.does span { color: #b9b9b9; }
+
+.new { margin-top: 26px; padding: 26px 28px; border-radius: 22px; background: var(--glass); border: 1px solid var(--line); backdrop-filter: blur(14px); }
+.new h3 { font-size: 20px; letter-spacing: -.02em; }
+.new time { color: var(--muted); font-size: 14px; }
+.new ul { margin-top: 14px; padding-left: 20px; color: #cfcfcf; }
+.new li + li { margin-top: 6px; }
+
+.steps { margin-top: 26px; padding-left: 22px; color: #cfcfcf; }
+.steps li + li { margin-top: 8px; }
+.steps b { color: var(--fg); }
+pre { margin-top: 10px; padding: 14px 16px; border-radius: 14px; background: #0d0d0d; border: 1px solid var(--line); overflow-x: auto; font: 13px/1.6 Consolas, "Cascadia Mono", monospace; color: #ddd; }
+.hash { word-break: break-all; white-space: pre-wrap; }
+
+footer { margin-top: 110px; padding: 28px 0 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+
+@media (max-width: 760px) {
+  .hero { padding-top: 40px; }
+  .does { grid-template-columns: 1fr; }
+  .shot { padding: 6px; border-radius: 16px; }
+  .shot img { border-radius: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .backdrop-art, .backdrop-fog { animation: none; }
+  .mark .full { animation: none; clip-path: none; }
+  .get { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="backdrop" aria-hidden="true"><div class="backdrop-art"></div><div class="backdrop-fog"></div><canvas id="embers"></canvas><div class="backdrop-shade"></div><div class="backdrop-grain"></div></div>
+
+<div class="wrap">
+  <header>
+    <a class="brand" href="./"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M26 0H36V24a8 8 0 0 0 8 8H56a8 8 0 0 0 8-8V0H74a26 26 0 0 1 26 26V74a26 26 0 0 1-26 26H64V76a8 8 0 0 0-8-8H44a8 8 0 0 0-8 8V100H26A26 26 0 0 1 0 74V26A26 26 0 0 1 26 0Z"/></svg>HuiClient</a>
+    <a class="quiet" href="https://github.com/Krozix1012/HuiClient-releases/releases">All releases</a>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div class="mark" aria-hidden="true">
+        <svg class="empty" viewBox="0 0 100 100"><path d="M26 0H36V24a8 8 0 0 0 8 8H56a8 8 0 0 0 8-8V0H74a26 26 0 0 1 26 26V74a26 26 0 0 1-26 26H64V76a8 8 0 0 0-8-8H44a8 8 0 0 0-8 8V100H26A26 26 0 0 1 0 74V26A26 26 0 0 1 26 0Z" transform="translate(2.5 2.5) scale(.95)"/></svg>
+        <svg class="full" viewBox="0 0 100 100"><path d="M26 0H36V24a8 8 0 0 0 8 8H56a8 8 0 0 0 8-8V0H74a26 26 0 0 1 26 26V74a26 26 0 0 1-26 26H64V76a8 8 0 0 0-8-8H44a8 8 0 0 0-8 8V100H26A26 26 0 0 1 0 74V26A26 26 0 0 1 26 0Z"/></svg>
+      </div>
+      <h1>HuiClient</h1>
+      <p class="lede">A Roblox launcher for Windows. Play, find your friends and switch accounts from one dark, quiet window.</p>
+      <a class="get" id="get" href="https://github.com/Krozix1012/HuiClient-releases/releases/latest"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Download for Windows</a>
+      <p class="meta" id="meta">For Windows 10 and 11.</p>
+    </div>
+
+    <figure class="shot"><img src="home.jpg" width="1400" height="860" alt="HuiClient's Home page: a featured game at the top, then rows of trending games, with the dock of buttons at the bottom."></figure>
+
+    <section aria-labelledby="does">
+      <h2 id="does">What it does</h2>
+      <p class="intro">Everything you open Roblox's website for, plus the things it doesn't do.</p>
+      <ul class="does">
+        <li><b>Several Roblox windows</b><span>Play on more than one account at the same time.</span></li>
+        <li><b>Your accounts</b><span>Sign in once per account, switch with a click, or log in with a code from your phone.</span></li>
+        <li><b>Friends</b><span>See who's online and what they're playing, chat, and join them.</span></li>
+        <li><b>Servers</b><span>Look through a game's servers, pick the one you join, and rejoin old ones.</span></li>
+        <li><b>Saved avatars</b><span>Browse the avatars a player saved in 3D, with every item and its price.</span></li>
+        <li><b>Playtime</b><span>How long you played today, this week, and in each game.</span></li>
+        <li><b>Roblox versions</b><span>HuiClient installs Roblox and Studio itself, and can repair them or roll back.</span></li>
+        <li><b>FastFlags and mods</b><span>Change Roblox's hidden settings, and use your own cursor, sounds and fonts.</span></li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="whatsnew" id="news" hidden>
+      <h2 id="whatsnew">What's new</h2>
+      <div class="new" id="newBox"></div>
+    </section>
+
+    <section aria-labelledby="install">
+      <h2 id="install">Installing</h2>
+      <ol class="steps">
+        <li>Open the file you downloaded.</li>
+        <li>Windows may say it <b>protected your PC</b>, because HuiClient isn't signed by a company. Choose <b>More info</b>, then <b>Run anyway</b>.</li>
+        <li>Pick where it goes and press <b>Install</b>. Updates show up inside HuiClient when they're out.</li>
+      </ol>
+      <p class="intro" id="checkIntro" hidden>To check that your download is the real one, run this in PowerShell in your Downloads folder. It should print the code under it.</p>
+      <pre id="checkCmd" hidden></pre>
+      <pre class="hash" id="hash" hidden></pre>
+    </section>
+  </main>
+
+  <footer>
+    <span>HuiClient isn't made by or connected to Roblox Corporation.</span>
+    <a class="quiet" href="https://github.com/Krozix1012/HuiClient-releases/releases">Older versions</a>
+  </footer>
+</div>
+
+<script>
+// Version, size, link and changelog come from the same file HuiClient checks for updates, so this page never needs editing for a release.
+fetch('latest.json', { cache: 'no-cache' }).then((r) => r.json()).then((v) => {
+  const file = v.url.split('/').pop();
+  document.getElementById('get').href = v.url;
+  document.getElementById('meta').textContent = `Version ${v.version}, ${Math.round(v.size / 1048576)} MB. For Windows 10 and 11.`;
+  const latest = (v.changelog || [])[0];
+  if (latest && latest.sections.length) {
+    const box = document.getElementById('newBox');
+    const h = document.createElement('h3');
+    h.textContent = `${latest.version}: ${latest.title}`;
+    const t = document.createElement('time');
+    t.dateTime = latest.date;
+    t.textContent = new Date(`${latest.date}T12:00:00`).toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric' });
+    box.append(h, t);
+    for (const [, items] of latest.sections) {
+      const ul = document.createElement('ul');
+      for (const text of items) { const li = document.createElement('li'); li.textContent = text; ul.append(li); }
+      box.append(ul);
+    }
+    document.getElementById('news').hidden = false;
+  }
+  document.getElementById('checkCmd').textContent = `(Get-FileHash .\\${file}).Hash`;
+  document.getElementById('hash').textContent = v.sha256.toUpperCase();
+  for (const id of ['checkIntro', 'checkCmd', 'hash']) document.getElementById(id).hidden = false;
+}).catch(() => {}); // the button still leads to the latest release
+
+// Embers drift up slowly, the same as on HuiClient's sign-in screen.
+(() => {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const c = document.getElementById('embers'), ctx = c.getContext('2d');
+  const size = () => { c.width = innerWidth * devicePixelRatio; c.height = innerHeight * devicePixelRatio; ctx.fillStyle = '#fff'; };
+  size();
+  addEventListener('resize', size);
+  const spawn = (anywhere) => ({ x: Math.random(), y: anywhere ? Math.random() : 1.04, r: Math.random() * 1.5 + 0.4, v: Math.random() * 0.00004 + 0.000015, p: Math.random() * 6.3, a: Math.random() * 0.55 + 0.2 });
+  const dots = Array.from({ length: 70 }, () => spawn(true));
+  let last = performance.now();
+  const frame = (t) => {
+    const dt = Math.min(64, t - last); last = t;
+    ctx.clearRect(0, 0, c.width, c.height);
+    for (const d of dots) {
+      d.y -= d.v * dt;
+      d.x += Math.sin(t / 2400 + d.p) * 0.00006 * dt;
+      if (d.y < -0.04) Object.assign(d, spawn(false));
+      ctx.globalAlpha = d.a * (0.55 + 0.45 * Math.sin(t / 380 + d.p));
+      ctx.beginPath();
+      ctx.arc(d.x * c.width, d.y * c.height, d.r * devicePixelRatio, 0, 6.3);
+      ctx.fill();
+    }
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
