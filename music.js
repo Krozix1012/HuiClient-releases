@@ -141,8 +141,6 @@
     btn.dataset.state = playing ? 'on' : muted ? 'off' : 'waiting';
     btn.setAttribute('aria-pressed', String(playing));
     btn.setAttribute('aria-label', playing ? 'Mute the music' : 'Play the music');
-    const tip = document.getElementById('musicTip');
-    if (tip) tip.textContent = playing ? 'Mute music' : 'Play music';
   };
 
   async function play() {
