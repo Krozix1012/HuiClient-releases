@@ -20,6 +20,10 @@ a { color: inherit; }
 .backdrop { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
 .backdrop-art { position: absolute; inset: -10%; background: url(home.jpg) center / cover; filter: grayscale(1) blur(16px) brightness(.42) contrast(1.25); transform: rotate(-6deg) scale(1.15); animation: drift 90s ease-in-out infinite alternate; }
 @keyframes drift { to { transform: rotate(-4deg) scale(1.25) translate(-3%, 2%); } }
+/* the lantern: a brighter copy of the art, showing only in a soft circle around the cursor */
+.backdrop-lamp { position: absolute; inset: 0; opacity: 0; transition: opacity .6s; -webkit-mask-image: radial-gradient(circle 300px at var(--lx, 50%) var(--ly, 40%), #000 0%, #0008 40%, transparent 72%); mask-image: radial-gradient(circle 300px at var(--lx, 50%) var(--ly, 40%), #000 0%, #0008 40%, transparent 72%); }
+.backdrop-lit { filter: grayscale(1) blur(10px) brightness(.85) contrast(1.2); }
+.backdrop.lit .backdrop-lamp { opacity: .55; }
 .backdrop-fog { position: absolute; inset: -30%; background: radial-gradient(40% 30% at 30% 60%, #ffffff12, transparent 70%), radial-gradient(35% 25% at 75% 35%, #ffffff0e, transparent 70%); animation: fog 40s ease-in-out infinite alternate; }
 @keyframes fog { to { transform: translate(8%, -6%) scale(1.15); } }
 .backdrop-shade { position: absolute; inset: 0; background: radial-gradient(ellipse 85% 75% at 50% 30%, #0000 0%, #0006 60%, #000d 100%); }
@@ -49,8 +53,23 @@ h1 { margin-top: 28px; font-size: clamp(52px, 10vw, 104px); font-weight: 800; le
 .get svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .meta { margin-top: 14px; color: var(--muted); font-size: 14px; }
 
-.shot { margin: 8px auto 0; padding: 10px; border-radius: 26px; background: var(--glass); border: 1px solid var(--line); box-shadow: 0 40px 120px #000; backdrop-filter: blur(14px); }
-.shot img { display: block; width: 100%; height: auto; border-radius: 17px; }
+/* the tour: HuiClient's own pill tabs over the preview, which tilts a little toward the cursor */
+.tour { perspective: 1600px; }
+.tour-tabs { display: flex; gap: 2px; width: fit-content; max-width: 100%; margin: 0 auto 16px; padding: 4px; overflow-x: auto; scrollbar-width: none; border: 1px solid #ffffff17; border-radius: 14px; background: #ffffff08; backdrop-filter: blur(12px); }
+.tour-tabs::-webkit-scrollbar { display: none; }
+.tour-tabs button { position: relative; flex: none; overflow: hidden; padding: 9px 15px; border: 0; border-radius: 10px; background: none; color: var(--muted); font: 600 14px Inter, "Segoe UI", sans-serif; white-space: nowrap; cursor: pointer; transition: color .2s, background .2s; }
+.tour-tabs button:hover { color: var(--fg); background: #ffffff0a; }
+.tour-tabs button[aria-selected="true"] { background: #fff; color: #000; box-shadow: 0 0 18px #ffffff33; }
+/* the selected pill doubles as the timer until the next screen */
+.tour-tabs button[aria-selected="true"]::after { content: ""; position: absolute; left: 0; bottom: 0; height: 2px; width: 100%; background: #0005; transform-origin: left; transform: scaleX(0); }
+.tour.auto .tour-tabs button[aria-selected="true"]::after { animation: timer var(--step) linear forwards; }
+.tour.auto.paused .tour-tabs button[aria-selected="true"]::after { animation-play-state: paused; }
+@keyframes timer { to { transform: scaleX(1); } }
+.shot { margin: 0 auto; padding: 10px; border-radius: 26px; background: var(--glass); border: 1px solid var(--line); box-shadow: 0 40px 120px #000; backdrop-filter: blur(14px); transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform .5s var(--ease); will-change: transform; }
+.shot-frame { position: relative; border-radius: 17px; overflow: hidden; background: #000; }
+.shot img { display: block; width: 100%; height: auto; transition: opacity .35s ease; }
+.shot img.fading { opacity: 0; }
+.shot figcaption { padding: 14px 8px 4px; color: #c9c9c9; text-align: center; font-size: 15px; min-height: 3.2em; }
 
 section { padding: 96px 0 0; }
 h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; letter-spacing: -.035em; line-height: 1.1; }
@@ -71,6 +90,11 @@ h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; letter-spacing: -.035e
 .steps b { color: var(--fg); }
 pre { margin-top: 10px; padding: 14px 16px; border-radius: 14px; background: #0d0d0d; border: 1px solid var(--line); overflow-x: auto; font: 13px/1.6 Consolas, "Cascadia Mono", monospace; color: #ddd; }
 .hash { word-break: break-all; white-space: pre-wrap; }
+.copyable { position: relative; }
+.copyable pre { padding-right: 86px; }
+.copy { position: absolute; top: 18px; right: 8px; padding: 5px 11px; border: 1px solid #ffffff26; border-radius: 9px; background: #161616; color: #ddd; font: 600 12px Inter, "Segoe UI", sans-serif; cursor: pointer; transition: background .15s, color .15s; }
+.copy:hover { background: #222; color: #fff; }
+.copy.done { background: #fff; color: #000; border-color: #fff; }
 
 footer { margin-top: 110px; padding: 28px 0 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
 
@@ -82,13 +106,14 @@ footer { margin-top: 110px; padding: 28px 0 40px; border-top: 1px solid var(--li
 }
 @media (prefers-reduced-motion: reduce) {
   .backdrop-art, .backdrop-fog { animation: none; }
+  .shot { transition: none; }
   .mark .full { animation: none; clip-path: none; }
   .get { transition: none; }
 }
 </style>
 </head>
 <body>
-<div class="backdrop" aria-hidden="true"><div class="backdrop-art"></div><div class="backdrop-fog"></div><canvas id="embers"></canvas><div class="backdrop-shade"></div><div class="backdrop-grain"></div></div>
+<div class="backdrop" id="backdrop" aria-hidden="true"><div class="backdrop-art"></div><div class="backdrop-lamp"><div class="backdrop-art backdrop-lit"></div></div><div class="backdrop-fog"></div><canvas id="embers"></canvas><div class="backdrop-shade"></div><div class="backdrop-grain"></div></div>
 
 <div class="wrap">
   <header>
@@ -108,7 +133,20 @@ footer { margin-top: 110px; padding: 28px 0 40px; border-top: 1px solid var(--li
       <p class="meta" id="meta">For Windows 10 and 11.</p>
     </div>
 
-    <figure class="shot"><img src="home.jpg" width="1400" height="860" alt="HuiClient's Home page: a featured game at the top, then rows of trending games, with the dock of buttons at the bottom."></figure>
+    <div class="tour">
+      <div class="tour-tabs" role="tablist" aria-label="Look around HuiClient">
+        <button role="tab" id="t-home" aria-controls="tourView" aria-selected="true" data-shot="home" data-say="What's popular right now, your favorites, and the games you played last." data-alt="HuiClient's Home page: a featured game, then rows of trending games, with the dock of buttons at the bottom.">Home</button>
+        <button role="tab" id="t-servers" aria-controls="tourView" aria-selected="false" tabindex="-1" data-shot="servers" data-say="Every open server, how full it is and its ping. Join the one you want." data-alt="A game's server list: a bar for how full each server is, its ping, and a Join button.">Servers</button>
+        <button role="tab" id="t-avatars" aria-controls="tourView" aria-selected="false" tabindex="-1" data-shot="avatars" data-say="Any player's saved avatars in 3D, with every item and its price." data-alt="A saved avatar shown in 3D next to the list of its items and their prices.">Saved avatars</button>
+        <button role="tab" id="t-playtime" aria-controls="tourView" aria-selected="false" tabindex="-1" data-shot="playtime" data-say="How long you played today and this week, and your most played games." data-alt="The Playtime page: today's time, a bar for each day of the week, and the most played games.">Playtime</button>
+        <button role="tab" id="t-versions" aria-controls="tourView" aria-selected="false" tabindex="-1" data-shot="versions" data-say="Pick Roblox's update channel, repair a broken install, or roll back an update." data-alt="Deployment settings: the update channel, the installed Roblox and Studio versions, and Repair and Roll back buttons.">Roblox versions</button>
+        <button role="tab" id="t-mods" aria-controls="tourView" aria-selected="false" tabindex="-1" data-shot="mods" data-say="Your own mouse cursor, font and sounds inside Roblox." data-alt="Mods settings: mouse cursor choices, the game font, other cursors and sounds.">Mods</button>
+      </div>
+      <figure class="shot" id="tourView" role="tabpanel" aria-labelledby="t-home">
+        <div class="shot-frame"><img id="tourImg" src="home.jpg" width="1400" height="860" alt="HuiClient's Home page: a featured game, then rows of trending games, with the dock of buttons at the bottom."></div>
+        <figcaption id="tourSay">What's popular right now, your favorites, and the games you played last.</figcaption>
+      </figure>
+    </div>
 
     <section aria-labelledby="does">
       <h2 id="does">What it does</h2>
@@ -138,8 +176,8 @@ footer { margin-top: 110px; padding: 28px 0 40px; border-top: 1px solid var(--li
         <li>Pick where it goes and press <b>Install</b>. Updates show up inside HuiClient when they're out.</li>
       </ol>
       <p class="intro" id="checkIntro" hidden>To check that your download is the real one, run this in PowerShell in your Downloads folder. It should print the code under it.</p>
-      <pre id="checkCmd" hidden></pre>
-      <pre class="hash" id="hash" hidden></pre>
+      <div class="copyable" id="checkBox" hidden><pre id="checkCmd"></pre><button class="copy" data-copy="checkCmd">Copy</button></div>
+      <div class="copyable" id="hashBox" hidden><pre class="hash" id="hash"></pre><button class="copy" data-copy="hash">Copy</button></div>
     </section>
   </main>
 
@@ -173,12 +211,104 @@ fetch('latest.json', { cache: 'no-cache' }).then((r) => r.json()).then((v) => {
   }
   document.getElementById('checkCmd').textContent = `(Get-FileHash .\\${file}).Hash`;
   document.getElementById('hash').textContent = v.sha256.toUpperCase();
-  for (const id of ['checkIntro', 'checkCmd', 'hash']) document.getElementById(id).hidden = false;
+  for (const id of ['checkIntro', 'checkBox', 'hashBox']) document.getElementById(id).hidden = false;
 }).catch(() => {}); // the button still leads to the latest release
 
-// Embers drift up slowly, the same as on HuiClient's sign-in screen.
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fine = matchMedia('(pointer: fine)').matches; // a mouse, not a finger
+const mouse = { x: -1e4, y: -1e4 };
+
+// Copy buttons say so when they've copied, like Quick Log In's code does in HuiClient.
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-copy]');
+  if (!b) return;
+  const box = document.getElementById(b.dataset.copy);
+  let done = await navigator.clipboard.writeText(box.textContent).then(() => true, () => false);
+  if (!done) { // some browsers block the clipboard: select the text, try the older copy, or let Ctrl+C do it
+    getSelection().selectAllChildren(box);
+    done = document.execCommand('copy');
+  }
+  b.textContent = done ? 'Copied' : 'Press Ctrl+C';
+  b.classList.toggle('done', done);
+  clearTimeout(b.timer);
+  b.timer = setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('done'); }, done ? 1600 : 3000);
+});
+
+// The tour: each tab shows that part of HuiClient. It steps forward on its own until you pick one.
 (() => {
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const tour = document.querySelector('.tour'), tabs = [...tour.querySelectorAll('[role=tab]')];
+  const img = document.getElementById('tourImg'), say = document.getElementById('tourSay'), view = document.getElementById('tourView');
+  const STEP = 5000;
+  tour.style.setProperty('--step', `${STEP}ms`);
+  for (const t of tabs) new Image().src = `${t.dataset.shot}.jpg`; // ready before their turn
+  let timer = 0, left = STEP, started = 0, auto = !still;
+  const select = (t, focus) => {
+    for (const x of tabs) { const on = x === t; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1; }
+    view.setAttribute('aria-labelledby', t.id);
+    say.textContent = t.dataset.say;
+    if (focus) t.focus();
+    // keeps the pill in view on narrow screens by scrolling only the bar, never the page
+    const bar = t.parentElement;
+    const from = t.getBoundingClientRect().left - bar.getBoundingClientRect().left + bar.scrollLeft;
+    bar.scrollTo({ left: from - (bar.clientWidth - t.offsetWidth) / 2, behavior: still ? 'auto' : 'smooth' });
+    img.classList.add('fading');
+    setTimeout(() => { img.src = `${t.dataset.shot}.jpg`; img.alt = t.dataset.alt; img.classList.remove('fading'); }, still ? 0 : 280);
+  };
+  const next = () => { select(tabs[(tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true') + 1) % tabs.length]); run(STEP); };
+  // the timer restarts the pill's fill animation by toggling the class
+  const run = (ms) => { if (!auto) return; tour.classList.remove('auto'); void tour.offsetWidth; tour.classList.add('auto'); left = ms; started = performance.now(); timer = setTimeout(next, ms); };
+  const stop = () => { auto = false; clearTimeout(timer); tour.classList.remove('auto', 'paused'); };
+  const pause = () => { if (!auto || tour.classList.contains('paused')) return; clearTimeout(timer); left -= performance.now() - started; tour.classList.add('paused'); };
+  const resume = () => { if (!auto || !tour.classList.contains('paused')) return; tour.classList.remove('paused'); started = performance.now(); timer = setTimeout(next, left); };
+  tour.addEventListener('click', (e) => { const t = e.target.closest('[role=tab]'); if (t) { stop(); select(t); } });
+  tour.addEventListener('keydown', (e) => {
+    const i = tabs.indexOf(document.activeElement);
+    if (i < 0) return;
+    const to = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+    if (to === undefined) return;
+    e.preventDefault();
+    stop();
+    select(tabs[(to + tabs.length) % tabs.length], true);
+  });
+  tour.addEventListener('pointerenter', pause);
+  tour.addEventListener('pointerleave', resume);
+  tour.addEventListener('focusin', pause);
+  tour.addEventListener('focusout', resume);
+  // only runs while you can see it
+  new IntersectionObserver(([e]) => (e.isIntersecting ? resume() : pause())).observe(tour);
+  run(STEP);
+
+  // a slight tilt toward the cursor
+  if (!fine || still) return;
+  view.addEventListener('pointermove', (e) => {
+    const r = view.getBoundingClientRect();
+    view.style.setProperty('--ry', `${((e.clientX - r.left) / r.width - 0.5) * 5}deg`);
+    view.style.setProperty('--rx', `${((e.clientY - r.top) / r.height - 0.5) * -4}deg`);
+  });
+  view.addEventListener('pointerleave', () => { view.style.removeProperty('--rx'); view.style.removeProperty('--ry'); });
+})();
+
+// The lantern follows the cursor across the backdrop.
+if (fine) {
+  const bd = document.getElementById('backdrop');
+  let queued = false;
+  addEventListener('pointermove', (e) => {
+    mouse.x = e.clientX; mouse.y = e.clientY;
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      bd.style.setProperty('--lx', `${mouse.x}px`);
+      bd.style.setProperty('--ly', `${mouse.y}px`);
+      bd.classList.add('lit');
+    });
+  });
+  document.documentElement.addEventListener('mouseleave', () => { bd.classList.remove('lit'); mouse.x = mouse.y = -1e4; });
+}
+
+// Embers drift up slowly, the same as on HuiClient's sign-in screen, and move out of the cursor's way.
+(() => {
+  if (still) return;
   const c = document.getElementById('embers'), ctx = c.getContext('2d');
   const size = () => { c.width = innerWidth * devicePixelRatio; c.height = innerHeight * devicePixelRatio; ctx.fillStyle = '#fff'; };
   size();
@@ -192,7 +322,9 @@ fetch('latest.json', { cache: 'no-cache' }).then((r) => r.json()).then((v) => {
     for (const d of dots) {
       d.y -= d.v * dt;
       d.x += Math.sin(t / 2400 + d.p) * 0.00006 * dt;
-      if (d.y < -0.04) Object.assign(d, spawn(false));
+      const dx = d.x * innerWidth - mouse.x, dy = d.y * innerHeight - mouse.y, near = Math.hypot(dx, dy);
+      if (near < 140 && near > 0) { const push = (1 - near / 140) * 0.0009 * dt; d.x += (dx / near) * push; d.y += (dy / near) * push * (innerWidth / innerHeight); }
+      if (d.y < -0.04 || d.x < -0.05 || d.x > 1.05) Object.assign(d, spawn(false));
       ctx.globalAlpha = d.a * (0.55 + 0.45 * Math.sin(t / 380 + d.p));
       ctx.beginPath();
       ctx.arc(d.x * c.width, d.y * c.height, d.r * devicePixelRatio, 0, 6.3);
