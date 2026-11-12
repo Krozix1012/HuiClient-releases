@@ -71,7 +71,8 @@ export function start(host, { still, mouse }) {
   const geo = new THREE.ExtrudeGeometry(SVGLoader.createShapes(path), { depth: 14, bevelEnabled: true, bevelThickness: 7, bevelSize: 4.5, bevelSegments: 10, curveSegments: 28 });
   geo.center();
   geo.rotateX(Math.PI); // SVG's y points down
-  const chrome = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 1, roughness: 0.1, clearcoat: 1, clearcoatRoughness: 0.04 });
+  // a touch less than a perfect mirror, so the thin bevels don't shimmer
+  const chrome = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 1, roughness: 0.15, clearcoat: 1, clearcoatRoughness: 0.08 });
   const logo = new THREE.Group();
   logo.add(new THREE.Mesh(geo, chrome));
   scene.add(logo);
@@ -81,25 +82,31 @@ export function start(host, { still, mouse }) {
   rim.position.set(140, -60, -120);
   scene.add(key, rim);
 
-  // glints sit on the logo's front corners and edges and twinkle at their own pace
+  // glints: one of the four outer corners flashes now and then, one at a time, never sitting on the face.
+  // They're drawn on top (so the bevels never cut them in half) and only while the front faces you.
   const glint = glintTexture();
-  const glints = [[-46, 44], [44, 40], [-12, 14], [40, -44], [-40, -46], [12, -16]].map(([x, y], i) => {
-    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glint, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
-    s.position.set(x, y, 14);
-    s.userData.phase = i * 1.7;
+  const glints = [[-44, 43], [44, 43], [44, -43], [-44, -43]].map(([x, y]) => {
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glint, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false, transparent: true }));
+    s.position.set(x, y, 16);
+    s.renderOrder = 2;
+    s.scale.setScalar(0.001);
     logo.add(s);
     return s;
   });
+  let flash = { i: -1, at: 0 }; // which corner is flashing, and since when
+  const front = new THREE.Vector3();
 
   // a wider lens up close, so the reflection changes across the face instead of being one flat tone
   const camera = new THREE.PerspectiveCamera(42, 1, 1, 2000);
   camera.position.set(0, 0, 245);
+  // resizing wipes the canvas, so it's redrawn straight away instead of showing a blank frame
   const resize = () => {
     const w = host.clientWidth, h = host.clientHeight;
     if (!w || !h) return;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    if (typeof draw === 'function') draw(performance.now());
   };
   const watch = new ResizeObserver(resize);
   watch.observe(host);
@@ -112,7 +119,7 @@ export function start(host, { still, mouse }) {
   const born = performance.now();
   let rx = 0, ry = 0;
   const ease = (x) => 1 - Math.pow(1 - x, 4);
-  const draw = (now) => {
+  var draw = (now) => {
     const t = (now - born) / 1000;
     const intro = still ? 1 : ease(Math.min(1, t / 1.8));
     const r = host.getBoundingClientRect();
@@ -128,10 +135,19 @@ export function start(host, { still, mouse }) {
     logo.rotation.set(rx + scrolled * 0.6, ry + (1 - intro) * -Math.PI * 1.15 + scrolled * 1.1, (1 - intro) * 0.3);
     logo.position.y = still ? 0 : Math.sin(t * 0.9) * 3;
     logo.scale.setScalar(0.7 + 0.3 * intro - scrolled * 0.15);
-    for (const s of glints) {
-      const tw = Math.max(0, Math.sin(t * 1.3 + s.userData.phase + ry * 3));
-      s.scale.setScalar(still ? 12 : 5 + Math.pow(tw, 6) * 26 * intro);
+    // how squarely the front faces the camera: 1 straight on, 0 side on
+    front.set(0, 0, 1).applyQuaternion(logo.quaternion);
+    const facing = Math.min(1, Math.max(0, (front.z - 0.75) / 0.2));
+    if (!still && intro === 1 && now - flash.at > 2200 + Math.random() * 1600) {
+      let i;
+      do i = Math.floor(Math.random() * glints.length); while (i === flash.i);
+      flash = { i, at: now };
     }
+    glints.forEach((s, i) => {
+      const k = i === flash.i ? (now - flash.at) / 900 : 1; // 0..1 over the flash
+      const size = k < 1 ? Math.sin(k * Math.PI) ** 2 * 24 : 0;
+      s.scale.setScalar(Math.max(0.001, size * facing));
+    });
     renderer.render(scene, camera);
   };
   if (still) draw(performance.now());
