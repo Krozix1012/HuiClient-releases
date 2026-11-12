@@ -238,12 +238,17 @@ document.addEventListener('click', async (e) => {
     back.removeAttribute('aria-hidden');
     front.alt = '';
     front.setAttribute('aria-hidden', 'true');
-    const opts = { duration: still ? 0 : 850, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' };
+    // a clean carousel: any slide still running is finished off first, then the old screen
+    // moves fully out on one side while the new one moves fully in from the other
+    for (const img of [front, back]) img.getAnimations().forEach((a) => a.cancel());
+    const opts = { duration: still ? 0 : 750, easing: 'cubic-bezier(.16,1,.3,1)' };
     back.style.opacity = 1;
     back.style.zIndex = 2;
     front.style.zIndex = 1;
+    back.style.transform = 'translateX(0)';
+    front.style.transform = `translateX(${-dir * 100}%)`;
     back.animate([{ transform: `translateX(${dir * 100}%)` }, { transform: 'translateX(0)' }], opts);
-    front.animate([{ transform: 'translateX(0)', opacity: 1, filter: 'brightness(1)' }, { transform: `translateX(${-dir * 28}%)`, opacity: 0.2, filter: 'brightness(.5)' }], opts);
+    front.animate([{ transform: 'translateX(0)' }, { transform: `translateX(${-dir * 100}%)` }], opts);
     [front, back] = [back, front];
   };
   const select = (i, { focus = false } = {}) => {

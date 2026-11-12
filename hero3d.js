@@ -2,6 +2,7 @@
 // floats a little, glints, and turns away as you scroll past it.
 import * as THREE from './vendor/three.module.min.js';
 import { SVGLoader } from './vendor/SVGLoader.js';
+import { toCreasedNormals } from './vendor/BufferGeometryUtils.js';
 
 const H = 'M26 0H36V24a8 8 0 0 0 8 8H56a8 8 0 0 0 8-8V0H74a26 26 0 0 1 26 26V74a26 26 0 0 1-26 26H64V76a8 8 0 0 0-8-8H44a8 8 0 0 0-8 8V100H26A26 26 0 0 1 0 74V26A26 26 0 0 1 26 0Z';
 
@@ -16,10 +17,11 @@ function studio() {
     m.lookAt(0, 0, 0);
     env.add(m);
   };
-  strip(9, 0.9, [0, 4.5, 3.5], 6); // a long softbox above, toward the viewer
-  strip(0.8, 8, [-5.5, 0.5, 2.5], 3.5); // a tall one on the left
-  strip(0.6, 6, [5.5, -1, 1], 2); // a dimmer one on the right
-  strip(2.2, 2.2, [3, 3.5, -4], 4); // a square light behind
+  // wide and gentle, not thin and blinding: tiny bright lights turn into speckle on the rounded edges
+  strip(9, 1.8, [0, 4.5, 3.5], 3); // a long softbox above, toward the viewer
+  strip(2.4, 8, [-5.5, 0.5, 2.5], 1.3); // a tall one on the left
+  strip(2, 6, [5.5, -1, 1], 0.8); // a dimmer one on the right
+  strip(3, 3, [3, 3.5, -4], 1.8); // a square light behind
   strip(14, 3, [0, -6, 1], 0.35); // a faint glow from the floor
   // behind the viewer: what the logo's front face mirrors. Bright above, dark below, with two light bands
   // that sweep across the face as it tilts.
@@ -64,11 +66,24 @@ export function start(host, { still, mouse }) {
 
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(studio(), 0.02).texture;
+  scene.environment = pmrem.fromScene(studio(), 0.04).texture; // a little blur keeps the reflections smooth (0.04 is about the most it allows)
   pmrem.dispose();
 
   const path = new SVGLoader().parse(`<svg xmlns="http://www.w3.org/2000/svg"><path d="${H}"/></svg>`).paths[0];
-  const geo = new THREE.ExtrudeGeometry(SVGLoader.createShapes(path), { depth: 14, bevelEnabled: true, bevelThickness: 7, bevelSize: 4.5, bevelSegments: 10, curveSegments: 28 });
+  // The outline ends on its own starting point. That zero-length edge leaves the bevel no direction
+  // there and showed as a dark notch, so repeated points are dropped first.
+  const shapes = SVGLoader.createShapes(path).map((s) => {
+    const pts = s.getPoints(28).filter((p, i, all) => p.distanceTo(all[(i + 1) % all.length]) > 0.05);
+    return new THREE.Shape(pts);
+  });
+  // The rounded edge is made of thin facets; shaded one by one, they speckle at an angle.
+  // Smoothing the shading across them (but keeping the sharp front and back edges) makes it one clean curve.
+  const raw = new THREE.ExtrudeGeometry(shapes, { depth: 14, bevelEnabled: true, bevelThickness: 7, bevelSize: 4.5, bevelSegments: 10 });
+  const flat = raw.getAttribute('normal').clone();
+  const geo = toCreasedNormals(raw, Math.PI / 5);
+  const caps = geo.groups[0]; // the flat front and back faces keep their own straight-on shading
+  const normal = geo.getAttribute('normal');
+  for (let i = caps.start; i < caps.start + caps.count; i++) normal.setXYZ(i, flat.getX(i), flat.getY(i), flat.getZ(i));
   geo.center();
   geo.rotateX(Math.PI); // SVG's y points down
   // a touch less than a perfect mirror, so the thin bevels don't shimmer
