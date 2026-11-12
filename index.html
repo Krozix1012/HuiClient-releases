@@ -28,21 +28,55 @@ a { color: inherit; }
 .backdrop-shade { position: absolute; inset: 0; background: radial-gradient(ellipse 85% 75% at 50% 30%, #0000 0%, #0006 60%, #000d 100%); }
 
 .wrap { width: min(1080px, 100% - 32px); margin: 0 auto; }
-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
+/* the header slides away while you scroll down and comes back when you scroll up */
+.site-head { position: fixed; inset: 0 0 auto 0; z-index: 50; border-bottom: 1px solid transparent; transition: transform .5s var(--ease), background .3s, border-color .3s; }
+.site-head.solid { background: #000b; border-color: var(--line); backdrop-filter: blur(16px); }
+.site-head.away { transform: translateY(-101%); }
+.head-in { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; }
+
+/* smooth scrolling (Lenis) */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* HuiClient's H as the cursor: it trails the mouse, leans into movement, grows over things you can click */
+html.own-cursor, html.own-cursor * { cursor: none !important; }
+.cursor { position: fixed; left: 0; top: 0; z-index: 200; width: 24px; height: 24px; margin: -12px 0 0 -12px; pointer-events: none; opacity: 0; mix-blend-mode: difference; transition: opacity .25s; will-change: transform; }
+.cursor.on { opacity: 1; }
+.cursor svg { display: block; width: 100%; height: 100%; fill: #fff; transition: transform .35s var(--ease); }
+.cursor.hover svg { transform: scale(1.9); }
+.cursor.down svg { transform: scale(.7); }
+.cursor.hover.down svg { transform: scale(1.5); }
+
+/* things rise into place as you reach them; headings slide up from behind their own edge */
+.js .reveal { opacity: 0; transform: translateY(34px); transition: opacity .9s var(--ease), transform 1.1s var(--ease); transition-delay: var(--d, 0s); }
+.js .reveal.in { opacity: 1; transform: none; }
+h2 .line { display: block; overflow: hidden; padding-bottom: .1em; margin-bottom: -.1em; }
+h2 .line > span { display: block; }
+.js h2.rise .line > span { transform: translateY(110%); transition: transform 1.1s var(--ease); }
+.js h2.rise.in .line > span { transform: none; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.3px; text-decoration: none; }
 .brand svg { width: 24px; height: 24px; fill: #fff; }
 .quiet { color: var(--muted); font-size: 14px; font-weight: 600; text-decoration: none; }
 .quiet:hover { color: var(--fg); }
 
-/* the logo fills with white from the bottom up, like the installer's progress */
-.hero { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 72px 0 56px; }
-.mark { position: relative; width: 104px; height: 104px; filter: drop-shadow(0 0 28px #ffffff40); }
+.hero { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 96px 0 56px; }
+/* the 3D chrome logo's stage; the flat logo below is what shows without WebGL */
+.stage { position: relative; width: min(460px, 92vw); aspect-ratio: 1.2; margin: 0 auto -28px; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.stage.is-3d .mark { display: none; }
+/* the flat logo fills with white from the bottom up, like the installer's progress */
+.mark { position: absolute; left: 50%; top: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; filter: drop-shadow(0 0 28px #ffffff40); }
 .mark svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .mark .empty path { fill: none; stroke: #ffffff3d; stroke-width: 2.4; stroke-linejoin: round; }
 .mark .full path { fill: #fff; }
 .mark .full { clip-path: inset(100% 0 0 0); animation: fill 1.4s cubic-bezier(.65,0,.35,1) .25s forwards; }
 @keyframes fill { to { clip-path: inset(0 0 0 0); } }
-h1 { margin-top: 28px; font-size: clamp(52px, 10vw, 104px); font-weight: 800; letter-spacing: -.055em; line-height: .95; text-shadow: 0 0 60px #ffffff26; }
+h1 { font-size: clamp(52px, 10vw, 104px); font-weight: 800; letter-spacing: -.055em; line-height: .95; text-shadow: 0 0 60px #ffffff26; }
+/* the name comes in letter by letter while the logo spins in */
+h1 .ch { display: inline-block; animation: letter 1s var(--ease) both; animation-delay: calc(.55s + var(--i) * 55ms); }
+@keyframes letter { from { opacity: 0; transform: translateY(.35em); filter: blur(10px); } }
+.hero > :not(.stage):not(h1) { animation: letter .8s var(--ease) .7s both; }
 .lede { max-width: 34ch; margin-top: 18px; color: #c9c9c9; font-size: clamp(17px, 2.2vw, 20px); }
 .get { display: inline-flex; align-items: center; gap: 12px; margin-top: 34px; padding: 16px 30px; border-radius: 16px; background: #fff; color: #000; font-weight: 700; font-size: 17px; text-decoration: none; box-shadow: 0 0 0 1px #fff, 0 18px 60px #ffffff24; transition: transform .2s var(--ease), box-shadow .2s; }
 .get:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px #fff, 0 22px 70px #ffffff38; }
@@ -105,23 +139,28 @@ footer { margin-top: 110px; padding: 28px 0 40px; border-top: 1px solid var(--li
   .shot { transition: none; }
   .mark .full { animation: none; clip-path: none; }
   .get { transition: none; }
+  h1 .ch, .hero > * { animation: none !important; }
 }
 </style>
 </head>
 <body>
 <div class="backdrop" id="backdrop" aria-hidden="true"><div class="backdrop-art"></div><div class="backdrop-shade"></div><canvas id="fog"></canvas><canvas id="embers"></canvas></div>
 
-<div class="wrap">
-  <header>
+<header class="site-head">
+  <div class="wrap head-in">
     <a class="brand" href="./"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M26 0H36V24a8 8 0 0 0 8 8H56a8 8 0 0 0 8-8V0H74a26 26 0 0 1 26 26V74a26 26 0 0 1-26 26H64V76a8 8 0 0 0-8-8H44a8 8 0 0 0-8 8V100H26A26 26 0 0 1 0 74V26A26 26 0 0 1 26 0Z"/></svg>HuiClient</a>
     <a class="quiet" href="https://github.com/Krozix1012/HuiClient-releases/releases">All releases</a>
-  </header>
+  </div>
+</header>
 
+<div class="wrap">
   <main>
     <div class="hero">
-      <div class="mark" aria-hidden="true">
+      <div class="stage" id="stage" aria-hidden="true">
+      <div class="mark">
         <svg class="empty" viewBox="0 0 100 100"><path d="M26 0H36V24a8 8 0 0 0 8 8H56a8 8 0 0 0 8-8V0H74a26 26 0 0 1 26 26V74a26 26 0 0 1-26 26H64V76a8 8 0 0 0-8-8H44a8 8 0 0 0-8 8V100H26A26 26 0 0 1 0 74V26A26 26 0 0 1 26 0Z" transform="translate(2.5 2.5) scale(.95)"/></svg>
         <svg class="full" viewBox="0 0 100 100"><path d="M26 0H36V24a8 8 0 0 0 8 8H56a8 8 0 0 0 8-8V0H74a26 26 0 0 1 26 26V74a26 26 0 0 1-26 26H64V76a8 8 0 0 0-8-8H44a8 8 0 0 0-8 8V100H26A26 26 0 0 1 0 74V26A26 26 0 0 1 26 0Z"/></svg>
+      </div>
       </div>
       <h1>HuiClient</h1>
       <p class="lede">A Roblox launcher for Windows. Play, find your friends and switch accounts from one dark, quiet window.</p>
@@ -183,7 +222,9 @@ footer { margin-top: 110px; padding: 28px 0 40px; border-top: 1px solid var(--li
   </footer>
 </div>
 
+<script src="vendor/lenis.min.js"></script>
 <script>
+document.documentElement.classList.add('js');
 // Version, size, link and changelog come from the same file HuiClient checks for updates, so this page never needs editing for a release.
 fetch('latest.json', { cache: 'no-cache' }).then((r) => r.json()).then((v) => {
   const file = v.url.split('/').pop();
@@ -213,6 +254,93 @@ fetch('latest.json', { cache: 'no-cache' }).then((r) => r.json()).then((v) => {
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const fine = matchMedia('(pointer: fine)').matches; // a mouse, not a finger
 const mouse = { x: -1e4, y: -1e4 };
+const H_PATH = 'M26 0H36V24a8 8 0 0 0 8 8H56a8 8 0 0 0 8-8V0H74a26 26 0 0 1 26 26V74a26 26 0 0 1-26 26H64V76a8 8 0 0 0-8-8H44a8 8 0 0 0-8 8V100H26A26 26 0 0 1 0 74V26A26 26 0 0 1 26 0Z';
+
+// Smooth scrolling: the page glides after the wheel instead of jumping.
+if (!still && window.Lenis) {
+  const lenis = new Lenis({ lerp: 0.09 });
+  const tick = (t) => { lenis.raf(t); requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+}
+
+// The header gets out of the way while you read down, and comes back when you scroll up or tab into it.
+(() => {
+  const head = document.querySelector('.site-head');
+  let lastY = scrollY;
+  addEventListener('scroll', () => {
+    const y = scrollY;
+    head.classList.toggle('solid', y > 24);
+    if (Math.abs(y - lastY) > 4) head.classList.toggle('away', y > lastY && y > 180);
+    lastY = y;
+  }, { passive: true });
+  head.addEventListener('focusin', () => head.classList.remove('away'));
+})();
+
+// The name comes in letter by letter; screen readers still read it as one word.
+(() => {
+  const h1 = document.querySelector('h1'), name = h1.textContent;
+  h1.setAttribute('aria-label', name);
+  h1.replaceChildren(...[...name].map((ch, i) => {
+    const s = document.createElement('span');
+    s.className = 'ch';
+    s.textContent = ch;
+    s.style.setProperty('--i', i);
+    s.setAttribute('aria-hidden', 'true');
+    return s;
+  }));
+})();
+
+// Headings slide up from behind their own edge and the rest rises into place as you reach it.
+(() => {
+  for (const h of document.querySelectorAll('main h2')) {
+    const inner = document.createElement('span'), line = document.createElement('span');
+    inner.textContent = h.textContent;
+    line.className = 'line';
+    line.append(inner);
+    h.replaceChildren(line);
+    h.classList.add('rise');
+  }
+  if (still) { for (const h of document.querySelectorAll('h2.rise')) h.classList.add('in'); return; }
+  const items = [...document.querySelectorAll('.tour, .intro, .does li, .new, .steps li, .copyable')];
+  items.forEach((el) => el.classList.add('reveal'));
+  document.querySelectorAll('.does li').forEach((li, i) => li.style.setProperty('--d', `${(i % 2) * 0.09}s`));
+  document.querySelectorAll('.steps li').forEach((li, i) => li.style.setProperty('--d', `${i * 0.08}s`));
+  const io = new IntersectionObserver((list) => {
+    for (const e of list) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  }, { rootMargin: '0px 0px -8% 0px' });
+  for (const el of [...items, ...document.querySelectorAll('h2.rise')]) io.observe(el);
+})();
+
+// HuiClient's H as the cursor, for mice only, and not when motion is turned down.
+if (fine && !still) {
+  const cur = document.createElement('div');
+  cur.className = 'cursor';
+  cur.setAttribute('aria-hidden', 'true');
+  cur.innerHTML = `<svg viewBox="0 0 100 100"><path d="${H_PATH}"/></svg>`;
+  document.body.append(cur);
+  document.documentElement.classList.add('own-cursor');
+  let x = -1e4, y = -1e4, lean = 0;
+  const tick = () => {
+    if (mouse.x > -1e3) {
+      if (x < -1e3) { x = mouse.x; y = mouse.y; } // first move: start where the mouse is
+      const nx = x + (mouse.x - x) * 0.5, ny = y + (mouse.y - y) * 0.5;
+      lean += (Math.max(-28, Math.min(28, (nx - x) * 1.4)) - lean) * 0.18;
+      x = nx; y = ny;
+      cur.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${lean}deg)`;
+      cur.classList.add('on');
+    } else cur.classList.remove('on');
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+  document.addEventListener('pointerover', (e) => cur.classList.toggle('hover', !!e.target.closest('a, button')));
+  addEventListener('pointerdown', () => cur.classList.add('down'));
+  addEventListener('pointerup', () => cur.classList.remove('down'));
+}
+
+// The 3D chrome logo. If WebGL or the module isn't available, the flat logo stays.
+import('./hero3d.js')
+  .then((m) => { const stage = document.getElementById('stage'); m.start(stage, { still, mouse }); stage.classList.add('is-3d'); })
+  .catch((e) => console.warn('3D logo off:', e.message));
 
 // Copy buttons say so when they've copied, like Quick Log In's code does in HuiClient.
 document.addEventListener('click', async (e) => {
