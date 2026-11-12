@@ -142,15 +142,20 @@ if (fine && !still) {
   addEventListener('pointerup', () => cur.classList.remove('down'));
 }
 
-// The opening: the logo spins in big in the middle of a black screen, then glides down into its place
+// First comes the enter screen: the click on it is what lets the browser start the music.
+// Then the opening: the logo spins in big in the middle of a black screen and glides down into its place
 // while the site fades in. It never leaves the page, it's only pinned and then let go, so there's no jump.
-// Until it lands nothing scrolls and clicks do nothing (except start the music).
+// Until it lands nothing scrolls and clicks do nothing.
 (() => {
   const html = document.documentElement, stage = document.getElementById('stage'), slot = document.getElementById('stageSlot');
-  const start3d = () => import('./hero3d.js')
+  const enter = document.getElementById('enter');
+  const logo = import('./hero3d.js'); // loads while the enter screen waits
+  const start3d = () => logo
     .then((m) => { m.start(stage, { still, mouse }); stage.classList.add('is-3d'); return true; })
     .catch((e) => { console.warn('3D logo off:', e.message); return false; });
-  if (still) { start3d(); return; } // no opening when motion is turned down
+  const entered = new Promise((resolve) => enter.addEventListener('click', () => { html.classList.add('entered'); enter.blur(); resolve(); }, { once: true }));
+  enter.focus({ preventScroll: true });
+  if (still) { entered.then(start3d); return; } // no opening when motion is turned down
 
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   scrollTo(0, 0);
@@ -159,7 +164,8 @@ if (fine && !still) {
   shield.className = 'intro-shield';
   document.body.append(shield);
   const KEYS = new Set([' ', 'PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter']);
-  const blockKey = (e) => { if (KEYS.has(e.key)) e.preventDefault(); };
+  // Enter and Space still work on the enter screen itself, so it can be opened from the keyboard
+  const blockKey = (e) => { if (KEYS.has(e.key) && !(e.target === enter && !html.classList.contains('entered'))) e.preventDefault(); };
   const blockScroll = (e) => e.preventDefault();
   addEventListener('keydown', blockKey, true);
   addEventListener('wheel', blockScroll, { capture: true, passive: false });
@@ -167,7 +173,7 @@ if (fine && !still) {
 
   const place = (r) => Object.assign(stage.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
   const big = () => { const w = Math.min(innerWidth, innerHeight * 1.2) * 0.98; return { left: (innerWidth - w) / 2, top: (innerHeight - w / 1.2) / 2, width: w, height: w / 1.2 }; };
-  stage.classList.add('flying');
+  stage.classList.add('flying', 'waiting');
   place(big());
   const followResize = () => place(big());
   addEventListener('resize', followResize);
@@ -193,8 +199,11 @@ if (fine && !still) {
     stage.addEventListener('transitionend', (e) => { if (e.propertyName === 'width') unlock(); }, { once: false });
     setTimeout(() => { if (html.classList.contains('locked')) unlock(); }, 1500); // in case the end event is missed
   };
-  start3d().then((ok) => setTimeout(land, ok ? 1800 : 0)); // lands once it has finished spinning in
-  setTimeout(land, 7000); // never stuck if the logo is slow to load
+  entered.then(() => {
+    stage.classList.remove('waiting');
+    start3d().then((ok) => setTimeout(land, ok ? 1800 : 0)); // lands once it has finished spinning in
+    setTimeout(land, 7000); // never stuck if the logo is slow to load
+  });
 })();
 
 // Copy buttons say so when they've copied, like Quick Log In's code does in HuiClient.

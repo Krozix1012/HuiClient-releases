@@ -62,6 +62,19 @@ html.locked, html.locked body { overflow: hidden; }
 html.opening .site-head, html.opening .sky, html.opening main > :not(.hero), html.opening .hero > :not(.stage-slot), html.opening footer, html.opening .music { opacity: 0; }
 html.opening h1 .ch, html.opening .hero > * { animation-play-state: paused; }
 .stage.flying { position: fixed; inset: auto; z-index: 95; }
+.stage.waiting { opacity: 0; }
+
+/* the enter screen: the click everyone makes to get in is what lets the browser start the music */
+.enter { display: none; }
+.js .enter { position: fixed; inset: 0; z-index: 100; display: grid; place-content: center; justify-items: center; gap: 22px; width: 100%; padding: 0; border: 0; background: #000; color: var(--muted); font: 500 15px Inter, "Segoe UI", sans-serif; letter-spacing: .01em; cursor: pointer; transition: opacity .8s ease, visibility 0s .8s; }
+.enter:focus-visible { outline: none; }
+.enter:focus-visible span { color: #fff; }
+.enter svg { width: 64px; height: 64px; fill: none; stroke: #fff; stroke-width: 2; stroke-linejoin: round; opacity: .55; animation: pulse 2.6s ease-in-out infinite; transition: transform .6s var(--glide), opacity .6s; }
+.enter:hover svg { opacity: .9; transform: scale(1.06); }
+.enter span { transition: color .4s; }
+.enter:hover span { color: #fff; }
+@keyframes pulse { 50% { opacity: .9; filter: drop-shadow(0 0 16px #ffffff66); } }
+.js.entered .enter { opacity: 0; visibility: hidden; pointer-events: none; }
 .stage.landing { transition: left 1.3s var(--glide), top 1.3s var(--glide), width 1.3s var(--glide), height 1.3s var(--glide); }
 
 /* 1. the hero fills the screen */
@@ -196,12 +209,16 @@ footer { padding: 28px 0 40px; border-top: 1px solid var(--line); color: var(--m
 }
 @media (prefers-reduced-motion: reduce) {
   .mark .full { animation: none; clip-path: none; }
-  h1 .ch, .hero > *, .scroll-hint i::after, .music::before { animation: none !important; }
+  h1 .ch, .hero > *, .scroll-hint i::after, .music::before, .enter svg { animation: none !important; }
   .tour-pill, .shot, .get, .does b { transition: none; }
 }
 </style>
 </head>
 <body>
+<button class="enter" id="enter" type="button" autofocus>
+  <svg viewBox="-4 -4 108 108" aria-hidden="true"><path d="M26 0H36V24a8 8 0 0 0 8 8H56a8 8 0 0 0 8-8V0H74a26 26 0 0 1 26 26V74a26 26 0 0 1-26 26H64V76a8 8 0 0 0-8-8H44a8 8 0 0 0-8 8V100H26A26 26 0 0 1 0 74V26A26 26 0 0 1 26 0Z"/></svg>
+  <span>Click anywhere to enter</span>
+</button>
 <div class="sky" aria-hidden="true"><canvas id="sky"></canvas></div>
 
 <header class="site-head">
