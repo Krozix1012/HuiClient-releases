@@ -4,6 +4,7 @@ const fine = matchMedia('(pointer: fine)').matches; // a mouse, not a finger
 const mouse = window.mouse = { x: -1e4, y: -1e4 }; // shared with sky.js
 const H_PATH = 'M26 0H36V24a8 8 0 0 0 8 8H56a8 8 0 0 0 8-8V0H74a26 26 0 0 1 26 26V74a26 26 0 0 1-26 26H64V76a8 8 0 0 0-8-8H44a8 8 0 0 0-8 8V100H26A26 26 0 0 1 0 74V26A26 26 0 0 1 26 0Z';
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+let hero = null; // the 3D logo's controls, once it has loaded
 if (fine) {
   addEventListener('pointermove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
   document.documentElement.addEventListener('mouseleave', () => { mouse.x = mouse.y = -1e4; });
@@ -151,7 +152,7 @@ if (fine && !still) {
   const enter = document.getElementById('enter');
   const logo = import('./hero3d.js'); // loads while the enter screen waits
   const start3d = () => logo
-    .then((m) => { m.start(stage, { still, mouse }); stage.classList.add('is-3d'); return true; })
+    .then((m) => { hero = m.start(stage, { still, mouse }); stage.classList.add('is-3d'); return true; })
     .catch((e) => { console.warn('3D logo off:', e.message); return false; });
   const entered = new Promise((resolve) => enter.addEventListener('click', () => { html.classList.add('entered'); enter.blur(); resolve(); }, { once: true }));
   enter.focus({ preventScroll: true });
@@ -204,6 +205,77 @@ if (fine && !still) {
     start3d().then((ok) => setTimeout(land, ok ? 1800 : 0)); // lands once it has finished spinning in
     setTimeout(land, 7000); // never stuck if the logo is slow to load
   });
+})();
+
+// The easter egg: click the 3D H and it jumps, spins, and throws off silver, black and white shards.
+(() => {
+  const stage = document.getElementById('stage'), html = document.documentElement;
+  const ready = () => hero && !html.classList.contains('locked');
+  // over the H the cursor grows like it does over buttons
+  stage.addEventListener('pointermove', (e) => {
+    const on = ready() && hero.hits(e.clientX, e.clientY);
+    stage.style.cursor = on ? 'pointer' : '';
+    document.querySelector('.cursor')?.classList.toggle('hover', on);
+  });
+  stage.addEventListener('click', (e) => {
+    if (!ready() || !hero.hits(e.clientX, e.clientY) || !hero.pop()) return;
+    window.huiPop?.();
+    setTimeout(() => burst(hero.center(), 70), hero.duration * 0.12); // as it leaves the ground
+    setTimeout(() => burst(hero.center(), 26, 0.5), hero.duration * 0.82); // a little puff on landing
+  });
+
+  let c = null, ctx = null, bits = [], running = false;
+  const KINDS = ['silver', 'silver', 'white', 'black'];
+  function burst({ x, y, size }, n, power = 1) {
+    if (!c) {
+      c = document.createElement('canvas');
+      c.setAttribute('aria-hidden', 'true');
+      Object.assign(c.style, { position: 'fixed', inset: '0', width: '100%', height: '100%', zIndex: 70, pointerEvents: 'none' });
+      document.body.append(c);
+      ctx = c.getContext('2d');
+    }
+    c.width = innerWidth * devicePixelRatio;
+    c.height = innerHeight * devicePixelRatio;
+    for (let i = 0; i < n; i++) {
+      const a = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.6; // mostly up and out
+      const sp = (260 + Math.random() * 520) * power;
+      bits.push({
+        x: x + (Math.random() - 0.5) * size * 0.6, y: y + (Math.random() - 0.5) * size * 0.4,
+        vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, rot: Math.random() * 6.3, vr: (Math.random() - 0.5) * 14,
+        w: 3 + Math.random() * 7, h: 2 + Math.random() * 4, kind: KINDS[i % KINDS.length], life: 0, max: 1.1 + Math.random() * 0.9,
+      });
+    }
+    if (!running) { running = true; let last = performance.now(); const tick = (t) => { const dt = Math.min(0.05, (t - last) / 1000); last = t; step(dt, t); if (bits.length) requestAnimationFrame(tick); else { running = false; ctx.clearRect(0, 0, c.width, c.height); } }; requestAnimationFrame(tick); }
+  }
+  function step(dt, t) {
+    const d = devicePixelRatio;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, c.width, c.height);
+    bits = bits.filter((b) => (b.life += dt) < b.max);
+    for (const b of bits) {
+      b.vy += 900 * dt; // gravity
+      b.vx *= 1 - 1.4 * dt; b.vy *= 1 - 0.6 * dt; // air
+      b.x += b.vx * dt; b.y += b.vy * dt; b.rot += b.vr * dt;
+      const fade = Math.min(1, (b.max - b.life) / 0.4);
+      // a shard tumbles: its width flips as it turns, so it flashes like a mirror
+      const flip = Math.abs(Math.cos(b.rot * 1.7));
+      ctx.setTransform(d, 0, 0, d, b.x * d, b.y * d);
+      ctx.rotate(b.rot);
+      ctx.globalAlpha = fade;
+      if (b.kind === 'silver') {
+        const g = ctx.createLinearGradient(-b.w, 0, b.w, 0);
+        g.addColorStop(0, '#5a5a5a'); g.addColorStop(0.5, flip > 0.8 ? '#fff' : '#cfcfcf'); g.addColorStop(1, '#7a7a7a');
+        ctx.fillStyle = g;
+      } else ctx.fillStyle = b.kind === 'white' ? '#fff' : '#0b0b0b';
+      ctx.beginPath();
+      ctx.moveTo(-b.w * flip, 0); ctx.lineTo(0, -b.h); ctx.lineTo(b.w * flip, 0); ctx.lineTo(0, b.h); // a small diamond
+      ctx.closePath();
+      ctx.fill();
+      if (b.kind === 'black') { ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 0.8; ctx.stroke(); } // so black shows on black
+      if (b.kind !== 'black' && flip > 0.93) { ctx.globalAlpha = fade * 0.6; ctx.fillStyle = '#fff'; ctx.fillRect(-b.w * 1.6, -0.5, b.w * 3.2, 1); } // a glint
+    }
+    ctx.globalAlpha = 1;
+  }
 })();
 
 // Copy buttons say so when they've copied, like Quick Log In's code does in HuiClient.

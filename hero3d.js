@@ -89,7 +89,8 @@ export function start(host, { still, mouse }) {
   // a touch less than a perfect mirror, so the thin bevels don't shimmer
   const chrome = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 1, roughness: 0.15, clearcoat: 1, clearcoatRoughness: 0.08 });
   const logo = new THREE.Group();
-  logo.add(new THREE.Mesh(geo, chrome));
+  const body = new THREE.Mesh(geo, chrome);
+  logo.add(body);
   scene.add(logo);
   const key = new THREE.DirectionalLight(0xffffff, 2.6);
   key.position.set(-80, 140, 160);
@@ -134,6 +135,22 @@ export function start(host, { still, mouse }) {
   const born = performance.now();
   let rx = 0, ry = 0;
   const ease = (x) => 1 - Math.pow(1 - x, 4);
+  // the easter egg: crouch, jump, two spins in the air, land with a little squash and settle
+  const POP = 1500;
+  let popAt = 0;
+  const hop = (now) => {
+    const k = popAt ? (now - popAt) / POP : 1;
+    if (k >= 1) { popAt = 0; return { y: 0, spin: 0, sx: 1, sy: 1 }; }
+    const air = Math.min(1, Math.max(0, (k - 0.08) / 0.72)); // in the air from 8% to 80%
+    const y = 4 * air * (1 - air) * 26;
+    const spin = (1 - (1 - air) ** 3) * Math.PI * 4;
+    let s = 0; // squash: >0 flattens, <0 stretches
+    if (k < 0.08) s = Math.sin((k / 0.08) * Math.PI) * 0.12; // crouch
+    else if (k < 0.2) s = -Math.sin(((k - 0.08) / 0.12) * Math.PI) * 0.1; // stretch on take-off
+    else if (k > 0.8) s = Math.sin(((k - 0.8) / 0.2) * Math.PI) * 0.14 * (1 - (k - 0.8) / 0.2 * 0.5); // land
+    return { y, spin, sx: 1 + s * 0.6, sy: 1 - s };
+  };
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
   var draw = (now) => {
     const t = (now - born) / 1000;
     const intro = still ? 1 : ease(Math.min(1, t / 1.8));
@@ -147,9 +164,11 @@ export function start(host, { still, mouse }) {
     rx += (ty * 0.45 - rx) * 0.06;
     ry += (tx * 0.6 - ry) * 0.06;
     const scrolled = Math.min(1, Math.max(0, -r.top / r.height)); // 0 at the top, 1 once the hero is gone
-    logo.rotation.set(rx + scrolled * 0.6, ry + (1 - intro) * -Math.PI * 1.15 + scrolled * 1.1, (1 - intro) * 0.3);
-    logo.position.y = still ? 0 : Math.sin(t * 0.9) * 3;
-    logo.scale.setScalar(0.7 + 0.3 * intro - scrolled * 0.15);
+    const j = hop(now);
+    logo.rotation.set(rx + scrolled * 0.6, ry + (1 - intro) * -Math.PI * 1.15 + scrolled * 1.1 + j.spin, (1 - intro) * 0.3);
+    logo.position.y = (still ? 0 : Math.sin(t * 0.9) * 3) + j.y;
+    const size = 0.7 + 0.3 * intro - scrolled * 0.15;
+    logo.scale.set(size * j.sx, size * j.sy, size);
     // how squarely the front faces the camera: 1 straight on, 0 side on
     front.set(0, 0, 1).applyQuaternion(logo.quaternion);
     const facing = Math.min(1, Math.max(0, (front.z - 0.75) / 0.2));
@@ -167,4 +186,28 @@ export function start(host, { still, mouse }) {
   };
   if (still) draw(performance.now());
   else { const loop = (now) => { if (visible) draw(now); requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
+
+  return {
+    // whether a point on the screen is on the H itself, not the empty space around it
+    hits(x, y) {
+      const r = renderer.domElement.getBoundingClientRect();
+      ndc.set(((x - r.left) / r.width) * 2 - 1, -((y - r.top) / r.height) * 2 + 1);
+      ray.setFromCamera(ndc, camera);
+      return ray.intersectObject(body, false).length > 0;
+    },
+    // starts the jump; false while one is still going
+    pop() {
+      if (still || popAt) return false;
+      popAt = performance.now();
+      return true;
+    },
+    // where the logo is on the screen right now, for the particles
+    center() {
+      const p = new THREE.Vector3();
+      body.getWorldPosition(p).project(camera);
+      const r = renderer.domElement.getBoundingClientRect();
+      return { x: r.left + (p.x + 1) / 2 * r.width, y: r.top + (1 - p.y) / 2 * r.height, size: r.height * 0.5 };
+    },
+    duration: POP,
+  };
 }
