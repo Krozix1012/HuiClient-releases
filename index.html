@@ -40,6 +40,9 @@ a { color: inherit; }
 .quiet::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform .45s var(--glide); }
 .quiet:hover { color: var(--fg); }
 .quiet:hover::after { transform: scaleX(1); transform-origin: left; }
+.head-links { display: flex; gap: 22px; }
+.discord { display: inline-flex; margin-top: 26px; padding: 13px 22px; border: 1px solid #ffffff33; border-radius: 14px; color: var(--fg); font-weight: 700; text-decoration: none; transition: background .4s, border-color .4s, transform .5s var(--glide); }
+.discord:hover { background: #ffffff14; border-color: #fff; transform: translateY(-2px); }
 
 /* smooth scrolling (Lenis) */
 html.lenis, html.lenis body { height: auto; }
@@ -216,7 +219,7 @@ footer { padding: 28px 0 40px; border-top: 1px solid var(--line); color: var(--m
 <header class="site-head">
   <div class="wrap head-in">
     <a class="brand" href="./"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M26 0H36V24a8 8 0 0 0 8 8H56a8 8 0 0 0 8-8V0H74a26 26 0 0 1 26 26V74a26 26 0 0 1-26 26H64V76a8 8 0 0 0-8-8H44a8 8 0 0 0-8 8V100H26A26 26 0 0 1 0 74V26A26 26 0 0 1 26 0Z"/></svg>HuiClient</a>
-    <a class="quiet" href="https://github.com/Krozix1012/HuiClient-releases/releases">All releases</a>
+    <nav class="head-links"><a class="quiet" href="https://discord.gg/JXSJFq9Wd" target="_blank" rel="noopener">Discord</a><a class="quiet" href="https://github.com/Krozix1012/HuiClient-releases/releases">All releases</a></nav>
   </div>
 </header>
 
@@ -300,6 +303,20 @@ footer { padding: 28px 0 40px; border-top: 1px solid var(--line); color: var(--m
       </ol>
     </section>
 
+    <section class="block" aria-labelledby="made">
+      <div class="does-grid">
+        <div class="does-head">
+          <h2 id="made">Made by</h2>
+          <p class="sub reveal">Questions, ideas or a bug? Come say hi.</p>
+          <a class="discord reveal" href="https://discord.gg/JXSJFq9Wd" target="_blank" rel="noopener">Join the Discord</a>
+        </div>
+        <ul class="does">
+          <li class="reveal"><b>Krozix</b><span>Creator and developer</span></li>
+          <li class="reveal"><b>nf1r</b><span>Designer and tester. Came up with some of the ideas.</span></li>
+        </ul>
+      </div>
+    </section>
+
     <section class="cta" aria-labelledby="ready">
       <h2 id="ready">Ready when you are.</h2>
       <p class="sub reveal">Free, and it installs in seconds.</p>
@@ -310,7 +327,7 @@ footer { padding: 28px 0 40px; border-top: 1px solid var(--line); color: var(--m
 
   <footer>
     <span>HuiClient isn't made by or connected to Roblox Corporation.</span>
-    <a class="quiet" href="https://github.com/Krozix1012/HuiClient-releases/releases">Older versions</a>
+    <span class="head-links"><a class="quiet" href="https://discord.gg/JXSJFq9Wd" target="_blank" rel="noopener">Discord</a><a class="quiet" href="https://github.com/Krozix1012/HuiClient-releases/releases">Older versions</a></span>
   </footer>
 </div>
 
