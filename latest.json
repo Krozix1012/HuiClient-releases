@@ -1,14 +1,14 @@
 {
   "version": "1.0.2",
   "date": "2026-11-13",
-  "size": 241572432,
-  "sha256": "6330e49c24ca17aa55324e8c003f0330a5ada7d2c5bd989f34c55e244618d0c7",
+  "size": 241580198,
+  "sha256": "260a09d37619bd3729ff0ccc6395a5f3bdb05fb114cf1cdcd44bc1026a9e183b",
   "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.2/HuiClient-Setup-1.0.2.exe",
   "app": {
     "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.2/HuiClient-app-1.0.2.asar",
-    "size": 1282686,
+    "size": 1290452,
     "electron": "33.2.1",
-    "sha256": "0dc76d2f9b5df4f92ad4ce8ce85116bd51c5885910e5a455c595184d864a16ff"
+    "sha256": "8689c07d4e497bd3e9096157c2bc86c96e308afff170b4490ac0123adcdfd2f2"
   },
   "changelog": [
     {
@@ -23,6 +23,7 @@
             "Your friends are always on the right of Home: who's in a game (with Join), who's online, and offline folded away.",
             "Popular now switches between Roblox's lists (Top Trending, Up-and-Coming and more) with one click.",
             "Choose a version in Settings > Deployment: install any Roblox version your version archive saved, with the day Roblox released it.",
+            "Every friend, follower and followed player of anyone: click the counts on a profile, with a search box for each list.",
             "A Back button on game, profile and item pages.",
             "Settings > About, with the Discord server and credits."
           ]
@@ -42,8 +43,9 @@
         [
           "Fixed",
           [
+            "Launching Roblox sometimes started it logged out, because HuiClient briefly couldn't read its own settings.",
             "Fewest players now really shows the emptiest servers, and Join least full joins one.",
-            "Friends no longer show up without a name.",
+            "Friends no longer show up without a name, and names load much faster.",
             "Head shapes all showed the head you're wearing.",
             "Saved outfits Roblox has no picture of show a grey stand-in instead of nothing."
           ]
