@@ -219,6 +219,13 @@ if (fine && !still) {
     setTimeout(() => burst(hero.center(), 70), hero.duration * 0.12); // as it leaves the ground
     setTimeout(() => burst(hero.center(), 26, 0.5), hero.duration * 0.82); // a little puff on landing
   });
+  // Any other click throws off a small handful of the same shards, with a quiet glassy tick.
+  addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || still || html.classList.contains('locked')) return;
+    if (hero && hero.hits(e.clientX, e.clientY)) return; // the H has its own, bigger one
+    window.huiTap?.();
+    burst({ x: e.clientX, y: e.clientY, size: 6 }, 12, 0.42);
+  });
 
   let c = null, ctx = null, bits = [], running = false;
   const KINDS = ['silver', 'silver', 'white', 'black'];

@@ -88,6 +88,27 @@
     src.stop(t + 0.55);
   };
 
+  // A click anywhere: two or three tiny glassy tings, quiet, and silent while the music is muted.
+  let lastTap = 0;
+  window.huiTap = () => {
+    const now = performance.now();
+    if (muted || now - lastTap < 60 || !audio()) return;
+    lastTap = now;
+    const t = ac.currentTime + 0.005;
+    for (let i = 0, n = 2 + (Math.random() < 0.5); i < n; i++) {
+      const at = t + i * (0.03 + Math.random() * 0.03), o = ac.createOscillator(), g = ac.createGain(), p = ac.createStereoPanner();
+      o.type = 'sine';
+      o.frequency.value = 3600 + Math.random() * 3000;
+      p.pan.value = Math.random() * 1.2 - 0.6;
+      g.gain.setValueAtTime(0.0001, at);
+      g.gain.exponentialRampToValueAtTime(0.012 + Math.random() * 0.01, at + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, at + 0.08 + Math.random() * 0.06);
+      o.connect(g).connect(p).connect(ac.destination);
+      o.start(at);
+      o.stop(at + 0.2);
+    }
+  };
+
   // The logo's easter egg: a whoosh as it jumps, a glittery scatter while the shards fly, a soft thump when it lands.
   // It plays even with the music muted, since it only ever comes from a click on the logo.
   window.huiPop = () => {
