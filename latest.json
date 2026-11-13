@@ -1,9 +1,15 @@
 {
   "version": "1.0.2",
   "date": "2026-11-13",
-  "size": 241566498,
-  "sha256": "4afe329e54e35cb238dd4f035206e5df160e8326157686970de2787ef8dc4b7a",
+  "size": 241572432,
+  "sha256": "6330e49c24ca17aa55324e8c003f0330a5ada7d2c5bd989f34c55e244618d0c7",
   "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.2/HuiClient-Setup-1.0.2.exe",
+  "app": {
+    "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.2/HuiClient-app-1.0.2.asar",
+    "size": 1282686,
+    "electron": "33.2.1",
+    "sha256": "0dc76d2f9b5df4f92ad4ce8ce85116bd51c5885910e5a455c595184d864a16ff"
+  },
   "changelog": [
     {
       "version": "1.0.2",
@@ -24,6 +30,7 @@
         [
           "Improved",
           [
+            "Updates download only what changed (about 1 MB instead of the 230 MB installer) and restart HuiClient by themselves.",
             "The bottom dock names each button when you point at it.",
             "Saved avatars open in 3D much faster.",
             "Clicking an item in your avatar inventory opens its page.",
