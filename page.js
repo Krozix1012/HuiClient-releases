@@ -13,7 +13,6 @@ if (fine) {
 // Version, size, link and changelog come from the same file HuiClient checks for updates,
 // so this page never needs editing for a release.
 fetch('latest.json', { cache: 'no-cache' }).then((r) => r.json()).then((v) => {
-  const file = v.url.split('/').pop();
   for (const a of document.querySelectorAll('[data-get]')) a.href = v.url;
   for (const m of document.querySelectorAll('[data-meta]')) m.textContent = `Version ${v.version}, ${Math.round(v.size / 1048576)} MB. For Windows 10 and 11.`;
   const latest = (v.changelog || [])[0];
@@ -32,9 +31,6 @@ fetch('latest.json', { cache: 'no-cache' }).then((r) => r.json()).then((v) => {
     }
     document.getElementById('news').hidden = false;
   }
-  document.getElementById('checkCmd').textContent = `(Get-FileHash .\\${file}).Hash`;
-  document.getElementById('hash').textContent = v.sha256.toUpperCase();
-  for (const id of ['checkIntro', 'checkBox', 'hashBox']) document.getElementById(id).hidden = false;
 }).catch(() => {}); // the buttons still lead to the latest release
 
 // Smooth scrolling: the page glides after the wheel instead of jumping.
@@ -277,22 +273,6 @@ if (fine && !still) {
     ctx.globalAlpha = 1;
   }
 })();
-
-// Copy buttons say so when they've copied, like Quick Log In's code does in HuiClient.
-document.addEventListener('click', async (e) => {
-  const b = e.target.closest('[data-copy]');
-  if (!b) return;
-  const box = document.getElementById(b.dataset.copy);
-  let done = await navigator.clipboard.writeText(box.textContent).then(() => true, () => false);
-  if (!done) { // some browsers block the clipboard: select the text, try the older copy, or let Ctrl+C do it
-    getSelection().selectAllChildren(box);
-    done = document.execCommand('copy');
-  }
-  b.textContent = done ? 'Copied' : 'Press Ctrl+C';
-  b.classList.toggle('done', done);
-  clearTimeout(b.timer);
-  b.timer = setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('done'); }, done ? 1600 : 3000);
-});
 
 // The tour stays pinned while scrolling steps through the screens; the tabs jump there.
 // The pill and the screenshot slide over, fast at first and slowing down as they arrive, with a soft chime.

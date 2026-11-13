@@ -172,14 +172,6 @@ h2 .line > span { display: block; }
 .steps { margin-top: 30px; padding-left: 22px; color: #cfcfcf; font-size: 17px; }
 .steps li + li { margin-top: 10px; }
 .steps b { color: var(--fg); }
-.check { margin-top: 26px; color: var(--muted); max-width: 60ch; }
-pre { margin-top: 10px; padding: 14px 16px; border-radius: 14px; background: #0d0d0d; border: 1px solid var(--line); overflow-x: auto; font: 13px/1.6 Consolas, "Cascadia Mono", monospace; color: #ddd; }
-.hash { word-break: break-all; white-space: pre-wrap; }
-.copyable { position: relative; }
-.copyable pre { padding-right: 86px; }
-.copy { position: absolute; top: 18px; right: 8px; padding: 5px 11px; border: 1px solid #ffffff26; border-radius: 9px; background: #161616; color: #ddd; font: 600 12px Inter, "Segoe UI", sans-serif; cursor: pointer; transition: background .35s, color .35s, border-color .35s, transform .4s var(--glide); }
-.copy:hover { background: #222; color: #fff; transform: translateY(-1px); }
-.copy.done { background: #fff; color: #000; border-color: #fff; }
 
 /* 6. the last screen: one more way to download */
 .cta { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 18vh 0 10vh; }
@@ -306,9 +298,6 @@ footer { padding: 28px 0 40px; border-top: 1px solid var(--line); color: var(--m
         <li class="reveal">Windows may say it <b>protected your PC</b>, because HuiClient isn't signed by a company. Choose <b>More info</b>, then <b>Run anyway</b>.</li>
         <li class="reveal">Pick where it goes and press <b>Install</b>. Updates show up inside HuiClient when they're out.</li>
       </ol>
-      <p class="check reveal" id="checkIntro" hidden>To check that your download is the real one, run this in PowerShell in your Downloads folder. It should print the code under it.</p>
-      <div class="copyable reveal" id="checkBox" hidden><pre id="checkCmd"></pre><button class="copy" data-copy="checkCmd">Copy</button></div>
-      <div class="copyable reveal" id="hashBox" hidden><pre class="hash" id="hash"></pre><button class="copy" data-copy="hash">Copy</button></div>
     </section>
 
     <section class="cta" aria-labelledby="ready">
