@@ -1,14 +1,14 @@
 {
   "version": "1.0.2",
   "date": "2026-11-13",
-  "size": 241580198,
-  "sha256": "260a09d37619bd3729ff0ccc6395a5f3bdb05fb114cf1cdcd44bc1026a9e183b",
+  "size": 241580633,
+  "sha256": "0a22b2d0f0c1150d69d1d27bc1182b02428001237253ef0a9c75506cd15a9274",
   "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.2/HuiClient-Setup-1.0.2.exe",
   "app": {
     "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.2/HuiClient-app-1.0.2.asar",
-    "size": 1290452,
+    "size": 1290887,
     "electron": "33.2.1",
-    "sha256": "8689c07d4e497bd3e9096157c2bc86c96e308afff170b4490ac0123adcdfd2f2"
+    "sha256": "a6d65f2dbcbc93783ed043b2e86bda56d386c24b92c0fb95e1533e51cca9ff81"
   },
   "changelog": [
     {
