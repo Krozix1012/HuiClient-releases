@@ -253,18 +253,18 @@ footer { padding: 28px 0 40px; border-top: 1px solid var(--line); color: var(--m
         </div>
         <div class="tour-tabs" role="tablist" aria-label="HuiClient's screens">
           <span class="tour-pill" aria-hidden="true"></span>
-          <button role="tab" id="t-home" aria-controls="tourView" aria-selected="true" data-shot="home" data-say="What's popular right now, your favorites, and the games you played last." data-alt="HuiClient's Home page: a featured game, then rows of trending games, with the dock of buttons at the bottom.">Home</button>
-          <button role="tab" id="t-servers" aria-controls="tourView" aria-selected="false" tabindex="-1" data-shot="servers" data-say="Every open server, how full it is and its ping. Join the one you want." data-alt="A game's server list: a bar for how full each server is, its ping, and a Join button.">Servers</button>
+          <button role="tab" id="t-home" aria-controls="tourView" aria-selected="true" data-shot="home" data-say="The game you played last, ready to rejoin, then your favorites and what's popular, with your friends on the side." data-alt="HuiClient's Home page: the last played game with a Play button, a grid of games to continue, popular games, and a friends column on the right.">Home</button>
+          <button role="tab" id="t-servers" aria-controls="tourView" aria-selected="false" tabindex="-1" data-shot="servers" data-say="Every open server, how full it is and its ping. Sort by most or fewest players and join the one you want." data-alt="A game's server list sorted by most players: a bar for how full each server is, its ping, and a Join button, next to the game's Play and quick-join buttons.">Servers</button>
           <button role="tab" id="t-avatars" aria-controls="tourView" aria-selected="false" tabindex="-1" data-shot="avatars" data-say="Any player's saved avatars in 3D, with every item and its price." data-alt="A saved avatar shown in 3D next to the list of its items and their prices.">Saved avatars</button>
           <button role="tab" id="t-playtime" aria-controls="tourView" aria-selected="false" tabindex="-1" data-shot="playtime" data-say="How long you played today and this week, and your most played games." data-alt="The Playtime page: today's time, a bar for each day of the week, and the most played games.">Playtime</button>
-          <button role="tab" id="t-versions" aria-controls="tourView" aria-selected="false" tabindex="-1" data-shot="versions" data-say="Pick Roblox's update channel, repair a broken install, or roll back an update." data-alt="Deployment settings: the update channel, the installed Roblox and Studio versions, and Repair and Roll back buttons.">Roblox versions</button>
+          <button role="tab" id="t-versions" aria-controls="tourView" aria-selected="false" tabindex="-1" data-shot="versions" data-say="Pick Roblox's update channel, repair a broken install, or roll back an update." data-alt="Deployment settings: the update channel, the installed Roblox and Studio versions, and Repair, Choose a version and Roll back buttons.">Roblox versions</button>
           <button role="tab" id="t-mods" aria-controls="tourView" aria-selected="false" tabindex="-1" data-shot="mods" data-say="Your own mouse cursor, font and sounds inside Roblox." data-alt="Mods settings: mouse cursor choices, the game font, other cursors and sounds.">Mods</button>
         </div>
         <div class="tour-progress" aria-hidden="true"><i id="tourProgress"></i></div>
         <div class="tour-stage">
           <figure class="shot" id="tourView" role="tabpanel" aria-labelledby="t-home">
-            <div class="shot-frame"><img id="shotA" src="home.jpg" width="1400" height="860" alt="HuiClient's Home page: a featured game, then rows of trending games, with the dock of buttons at the bottom."><img id="shotB" src="home.jpg" width="1400" height="860" alt="" aria-hidden="true" style="opacity:0"></div>
-            <figcaption id="tourSay">What's popular right now, your favorites, and the games you played last.</figcaption>
+            <div class="shot-frame"><img id="shotA" src="home.jpg" width="1400" height="860" alt="HuiClient's Home page: the last played game with a Play button, a grid of games to continue, popular games, and a friends column on the right."><img id="shotB" src="home.jpg" width="1400" height="860" alt="" aria-hidden="true" style="opacity:0"></div>
+            <figcaption id="tourSay">The game you played last, ready to rejoin, then your favorites and what's popular, with your friends on the side.</figcaption>
           </figure>
         </div>
       </div>
@@ -277,9 +277,10 @@ footer { padding: 28px 0 40px; border-top: 1px solid var(--line); color: var(--m
           <p class="sub reveal">Everything you open Roblox's website for, plus the things it doesn't do.</p>
         </div>
         <ul class="does">
+          <li class="reveal"><b>A Home that's yours</b><span>The game you played last, ready to rejoin, with your favorites and what's popular in tidy grids.</span></li>
           <li class="reveal"><b>Several Roblox windows</b><span>Play on more than one account at the same time.</span></li>
           <li class="reveal"><b>Your accounts</b><span>Sign in once per account, switch with a click, or log in with a code from your phone.</span></li>
-          <li class="reveal"><b>Friends</b><span>See who's online and what they're playing, chat, and join them.</span></li>
+          <li class="reveal"><b>Friends</b><span>See who's online and what they're playing right on Home, chat, and join them.</span></li>
           <li class="reveal"><b>Servers</b><span>Look through a game's servers, pick the one you join, and rejoin old ones.</span></li>
           <li class="reveal"><b>Saved avatars</b><span>Browse the avatars a player saved in 3D, with every item and its price.</span></li>
           <li class="reveal"><b>Playtime</b><span>How long you played today, this week, and in each game.</span></li>
