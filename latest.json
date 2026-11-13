@@ -1,10 +1,48 @@
 {
-  "version": "1.0.1",
-  "date": "2026-11-11",
-  "size": 241549560,
-  "sha256": "d3dfd4a4fc5a5cf8321bf6aff87b78a517d837d15d7fa496c4d1db55872bf883",
-  "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.1/HuiClient-Setup-1.0.1.exe",
+  "version": "1.0.2",
+  "date": "2026-11-13",
+  "size": 241566498,
+  "sha256": "4afe329e54e35cb238dd4f035206e5df160e8326157686970de2787ef8dc4b7a",
+  "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.2/HuiClient-Setup-1.0.2.exe",
   "changelog": [
+    {
+      "version": "1.0.2",
+      "date": "2026-11-13",
+      "title": "A new Home, and any Roblox version",
+      "sections": [
+        [
+          "New",
+          [
+            "Home is rebuilt: the game you played last up top, then Continue playing, Favorites and Popular now in tidy grids, with \"Show all\" instead of arrow rows.",
+            "Your friends are always on the right of Home: who's in a game (with Join), who's online, and offline folded away.",
+            "Popular now switches between Roblox's lists (Top Trending, Up-and-Coming and more) with one click.",
+            "Choose a version in Settings > Deployment: install any Roblox version your version archive saved, with the day Roblox released it.",
+            "A Back button on game, profile and item pages.",
+            "Settings > About, with the Discord server and credits."
+          ]
+        ],
+        [
+          "Improved",
+          [
+            "The bottom dock names each button when you point at it.",
+            "Saved avatars open in 3D much faster.",
+            "Clicking an item in your avatar inventory opens its page.",
+            "Head shapes are listed by name under your avatar instead of covering it.",
+            "The favorite button sits next to Play, and the quick-join buttons say what they do.",
+            "Pages that need an account have a Log in button, and the dock shows one when you're logged out."
+          ]
+        ],
+        [
+          "Fixed",
+          [
+            "Fewest players now really shows the emptiest servers, and Join least full joins one.",
+            "Friends no longer show up without a name.",
+            "Head shapes all showed the head you're wearing.",
+            "Saved outfits Roblox has no picture of show a grey stand-in instead of nothing."
+          ]
+        ]
+      ]
+    },
     {
       "version": "1.0.1",
       "date": "2026-11-11",
