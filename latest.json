@@ -1,16 +1,29 @@
 {
-  "version": "1.0.3",
+  "version": "1.0.4",
   "date": "2026-11-15",
-  "size": 241645590,
-  "sha256": "c20951701e6de51dc92a989a895d13545603420e158c142dc7cce1d9c42faa23",
-  "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.3/HuiClient-Setup-1.0.3.exe",
+  "size": 241646439,
+  "sha256": "a4379774c9d6ca5e46bb7a9ff2d4f0edf8b6601da6fe3c400ed82042a63846fc",
+  "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.4/HuiClient-Setup-1.0.4.exe",
   "app": {
-    "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.3/HuiClient-app-1.0.3.asar",
-    "size": 1355843,
+    "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.4/HuiClient-app-1.0.4.asar",
+    "size": 1356693,
     "electron": "33.2.1",
-    "sha256": "432c066e3f56eb6a9941cd4bb2459673598917a87af864f2f59ef0a68aa63440"
+    "sha256": "d8deed12b62dbfeeec7440df5515f300a29a8eb0cc0639767e1bb8a86ea1b393"
   },
   "changelog": [
+    {
+      "version": "1.0.4",
+      "date": "2026-11-15",
+      "title": "Friends show online again",
+      "sections": [
+        [
+          "Fixed",
+          [
+            "With a long friend list, everyone showed as offline on Home. Roblox only answers 50 friends at a time, so HuiClient now asks in groups."
+          ]
+        ]
+      ]
+    },
     {
       "version": "1.0.3",
       "date": "2026-11-15",
