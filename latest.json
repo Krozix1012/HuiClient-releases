@@ -1,16 +1,42 @@
 {
-  "version": "1.0.2",
-  "date": "2026-11-13",
-  "size": 241580633,
-  "sha256": "0a22b2d0f0c1150d69d1d27bc1182b02428001237253ef0a9c75506cd15a9274",
-  "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.2/HuiClient-Setup-1.0.2.exe",
+  "version": "1.0.3",
+  "date": "2026-11-15",
+  "size": 241645590,
+  "sha256": "c20951701e6de51dc92a989a895d13545603420e158c142dc7cce1d9c42faa23",
+  "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.3/HuiClient-Setup-1.0.3.exe",
   "app": {
-    "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.2/HuiClient-app-1.0.2.asar",
-    "size": 1290887,
+    "url": "https://github.com/Krozix1012/HuiClient-releases/releases/download/v1.0.3/HuiClient-app-1.0.3.asar",
+    "size": 1355843,
     "electron": "33.2.1",
-    "sha256": "a6d65f2dbcbc93783ed043b2e86bda56d386c24b92c0fb95e1533e51cca9ff81"
+    "sha256": "432c066e3f56eb6a9941cd4bb2459673598917a87af864f2f59ef0a68aa63440"
   },
   "changelog": [
+    {
+      "version": "1.0.3",
+      "date": "2026-11-15",
+      "title": "Your friends, your buttons",
+      "sections": [
+        [
+          "New",
+          [
+            "Favorite friends and make folders for them on Home, like \"FTAP friends\". Drag friends in, or use their menu, and move friends and folders up or down.",
+            "Unfriend several friends at once: press Select in Friends. A pop-up names everyone first and points out your favorites.",
+            "Customize buttons: a pop-up with a live preview of the dock and the sidebar. Hold and drag buttons to move them, rename or hide them, and add dividers.",
+            "Put the dock at the top, make it smaller or larger, show names under its icons, or make the sidebar icons only.",
+            "Buttons for your own programs in the dock or the sidebar, with the program's own icon.",
+            "Answer messages without opening HuiClient: right-click a chat pop-up for a small chat window. Chats also have a Pop out button.",
+            "Choose whether banned and deleted accounts show in your friends list on Home."
+          ]
+        ],
+        [
+          "Improved",
+          [
+            "A night sky behind everything, with stars, light rain and the odd comet, drifting slightly with the mouse.",
+            "Smoother animations when switching pages and tabs."
+          ]
+        ]
+      ]
+    },
     {
       "version": "1.0.2",
       "date": "2026-11-13",
